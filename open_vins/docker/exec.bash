@@ -1,0 +1,1 @@
+docker exec -it r2_gui bash 
