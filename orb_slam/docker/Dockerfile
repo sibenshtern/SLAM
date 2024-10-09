@@ -1,4 +1,8 @@
-FROM osrf/ros:noetic-desktop@sha256:637e06dd30895c510efc3ae579e07e59e4bea36eba48b3ba9aedf8afa236856d
+FROM ubuntu:20.04@sha256:4334ab5016f708cf4a15794e48ebea4c5666fd2bad49679badc4930bf42d9ccb
+
+SHELL ["bin/bash", "-c"]
+
+ARG DEBIAN_FRONTEND=noninteractive 
 
 RUN apt update && apt install -y \
     libopencv-dev \
@@ -7,7 +11,18 @@ RUN apt update && apt install -y \
     git \
     cmake \
     # Pangolin dependences
-    libepoxy-dev
+    g++ \
+    libboost-all-dev \
+    libssl-dev \
+    libgl1-mesa-dev \
+    libwayland-dev \
+    libxkbcommon-dev \
+    wayland-protocols \
+    libegl1-mesa-dev \
+    libc++-dev \
+    libepoxy-dev \
+    libglew-dev \
+    ninja-build
 
 # install Pangolin
 RUN cd tmp/ && \
