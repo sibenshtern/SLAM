@@ -34,7 +34,7 @@ RUN cd tmp/ && \
 # install ORB-SLAM3
 RUN mkdir /orb-slam && \
     cd /orb-slam && \
-    git clone -b c++14_comp --recursive https://github.com/UZ-SLAMLab/ORB_SLAM3.git . && \
+    git clone -b c++14_comp --depth=1 --recursive https://github.com/UZ-SLAMLab/ORB_SLAM3.git . && \
     sed -i 's/OpenCV 4.4/OpenCV 4.2/g' CMakeLists.txt && \
     cd ./Thirdparty/DBoW2 && mkdir -p build && cd build && cmake .. && make -j2 && \
     cd /orb-slam/Thirdparty/g2o && mkdir -p build && cd build && cmake .. && make -j2 && \
