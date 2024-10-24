@@ -1,4 +1,4 @@
-FROM ubuntu:20.04@sha256:4334ab5016f708cf4a15794e48ebea4c5666fd2bad49679badc4930bf42d9ccb
+FROM ubuntu:20.04
 
 SHELL ["bin/bash", "-c"]
 
@@ -11,7 +11,7 @@ RUN apt update && apt install -y \
     cmake \
     # Pangolin dependences
     g++ \
-    libboost-all-dev \
+    libboost-serialization-dev \
     python3-setuptools \
     libssl-dev \
     libgl1-mesa-dev \
@@ -22,7 +22,9 @@ RUN apt update && apt install -y \
     libc++-dev \
     libepoxy-dev \
     libglew-dev \
-    ninja-build
+    ninja-build && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # install Pangolin
 RUN cd tmp/ && \
@@ -30,9 +32,8 @@ RUN cd tmp/ && \
     cd Pangolin && \
     cmake -B build && \
     cmake --build build && \
-    rm -rf Pangolin && \
-    cd /
-
+    rm -rf Pangolin
+    
 # install ORB-SLAM3
 RUN mkdir /orb-slam && \
     cd /orb-slam && \

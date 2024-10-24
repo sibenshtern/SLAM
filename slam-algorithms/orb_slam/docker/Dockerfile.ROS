@@ -1,10 +1,9 @@
-FROM osrf/ros:noetic-desktop-full@sha256:637e06dd30895c510efc3ae579e07e59e4bea36eba48b3ba9aedf8afa236856d
+FROM osrf/ros:noetic-desktop-full
 
 SHELL ["bin/bash", "-c"]
 
 RUN apt update && apt install -y \
     libopencv-dev \
-    python3-opencv \
     libeigen3-dev \
     git \
     cmake \
@@ -12,6 +11,7 @@ RUN apt update && apt install -y \
     g++ \
     libssl-dev \
     libgl1-mesa-dev \
+    python3-setuptools \
     libwayland-dev \
     libxkbcommon-dev \
     wayland-protocols \
@@ -20,7 +20,9 @@ RUN apt update && apt install -y \
     libepoxy-dev \
     libglew-dev \
     ninja-build \
-    libboost-serialization-dev
+    libboost-serialization-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # install Pangolin
 RUN cd tmp/ && \
@@ -28,8 +30,7 @@ RUN cd tmp/ && \
     cd Pangolin && \
     cmake -B build && \
     cmake --build build && \
-    rm -rf Pangolin && \
-    cd /
+    rm -rf Pangolin
 
 # install ORB-SLAM3
 RUN mkdir /orb-slam && \
