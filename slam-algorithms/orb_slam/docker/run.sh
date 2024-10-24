@@ -6,11 +6,11 @@ function show_help() {
     echo "Usage: $0 [ARGUMENT] [--volume=<VOLUME>:<VOLUME_IN_DOCKER>]"
     echo
     echo "ARGUMENT:"
-    echo "  ros           Build the ORB_SLAM3 with ROS"
-    echo "  usual         Build the ORB_SLAM3 without ROS"
-    echo "  -h, --help    Display this help message"
+    echo "  ros                              Build the ORB_SLAM3 with ROS"
+    echo "  usual                            Build the ORB_SLAM3 without ROS"
+    echo "  -h, --help                       Display this help message"
     echo
-    echo "--volume=<VOLUME> (optional) Specify a directory to mount as a volume in the container."
+    echo "--volume=<VOLUME>:<DOCKER_VOLUME>  (optional) Specify a directory to mount as a volume in the container."
 }
 
 if [ "$#" -lt 1 ]; then
