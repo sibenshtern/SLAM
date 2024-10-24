@@ -1,1 +1,1 @@
-docker exec -it r2_gui bash 
+docker exec -it r2_ov_gui bash
