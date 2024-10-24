@@ -6,13 +6,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y \
     libopencv-dev \
-    python3-opencv \
     libeigen3-dev \
     git \
     cmake \
     # Pangolin dependences
     g++ \
     libboost-all-dev \
+    python3-setuptools \
     libssl-dev \
     libgl1-mesa-dev \
     libwayland-dev \
