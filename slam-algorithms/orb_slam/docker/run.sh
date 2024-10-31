@@ -51,7 +51,6 @@ case "$MODE" in
             --env="QT_X11_NO_MITSHM=1" \
             --platform=linux/amd64 \
             --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-            --volume="/Users/egorivanov/.Xauthority" \
             --env="XAUTHORITY=$XAUTH" \
             --volume="$XAUTH:$XAUTH" \
             ${VOLUME:+--volume="$HOST_VOLUME:$DOCKER_VOLUME"} \
@@ -69,7 +68,6 @@ case "$MODE" in
             --env="QT_X11_NO_MITSHM=1" \
             --platform=linux/amd64 \
             --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-            --volume="/Users/egorivanov/.Xauthority" \
             --env="XAUTHORITY=$XAUTH" \
             --volume="$XAUTH:$XAUTH" \
             ${VOLUME:+--volume="$HOST_VOLUME:$DOCKER_VOLUME"} \
