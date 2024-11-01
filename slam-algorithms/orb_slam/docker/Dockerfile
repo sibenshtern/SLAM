@@ -13,6 +13,8 @@ RUN apt update && apt install -y \
     g++ \
     libboost-serialization-dev \
     python3-setuptools \
+    python3-dev \
+    python3-wheel \
     libssl-dev \
     libgl1-mesa-dev \
     libwayland-dev \
@@ -31,7 +33,9 @@ RUN cd tmp/ && \
     git clone --recursive https://github.com/stevenlovegrove/Pangolin.git && \
     cd Pangolin && \
     cmake -B build && \
-    cmake --build build && \
+    cd build && \
+    cmake --build . && \
+    make install && \
     rm -rf Pangolin
     
 # install ORB-SLAM3
