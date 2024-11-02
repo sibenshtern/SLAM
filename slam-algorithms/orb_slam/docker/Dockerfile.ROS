@@ -29,6 +29,7 @@ RUN apt update && apt install -y \
 # install Pangolin
 RUN cd tmp/ && \
     git clone --recursive https://github.com/stevenlovegrove/Pangolin.git && \
+    git checkout ad60315 && \
     cd Pangolin && \
     cmake -B build && \
     cd build && \
