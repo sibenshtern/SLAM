@@ -6,6 +6,7 @@
 # $4 - 5 - models
 # $6 - 7 - topics
 # $8 - script folder
+
 xhost +
 docker run -i \
     -e "DISPLAY" -e "QT_X11_NO_MITSHM=1" \
@@ -22,4 +23,8 @@ python3 $8/import_pictures_for_undistortion.py $1/$2 $6 $7 $1/pictures
 
 first_part=$(echo "$2" | cut -d '.' -f 1)
 
-python3 $8/undistortion.py $1/pictures/img_0.png $1/pictures/img_1.png $1/$first_part-camchain.yaml
+if [[ $4 = $5 ]] && [[ $5 = "pinhole-radtan" ]]; then
+    python3 $8/undistortion_radtan.py $1/pictures/img_0.png $1/pictures/img_1.png $1/$first_part-camchain.yaml
+elif [[ $4 == $5 ]] && [[ $5 = "pinhole-equi" ]]; then
+    python3 $8/undistortion_equi.py $1/pictures/img_0.png $1/pictures/img_1.png $1/$first_part-camchain.yaml
+fi
