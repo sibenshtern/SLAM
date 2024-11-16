@@ -16,6 +16,6 @@ echo "calibrate finished"
 
 first_part=$(echo "$1" | cut -d '.' -f 1)
 
-chmod a+wr data/$first_part-camchain.yaml data/$first_part-report-cam.pdf
+chmod a+wr /data/$first_part-camchain.yaml /data/$first_part-report-cam.pdf
 
 exit
