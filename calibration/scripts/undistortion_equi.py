@@ -4,6 +4,9 @@ import sys
 from parse_yaml import get_parameters_from_yaml
 
 
+FOV = 125
+
+
 def get_extrinsics(src, dst):
     extrinsics = src.get_extrinsics_to(dst)
     R = np.reshape(extrinsics.rotation, [3,3]).T
@@ -30,18 +33,8 @@ def undistortion():
     min_disp = 0
     num_disp = 112 - min_disp
     max_disp = min_disp + num_disp
-
-    stereo = cv2.StereoSGBM_create(minDisparity = min_disp,
-                                   numDisparities = num_disp,
-                                   blockSize = 16,
-                                   P1 = 8*3*window_size**2,
-                                   P2 = 32*3*window_size**2,
-                                   disp12MaxDiff = 1,
-                                   uniquenessRatio = 10,
-                                   speckleWindowSize = 100,
-                                   speckleRange = 32)
     
-    stereo_fov_rad = 125 * (np.pi/180)
+    stereo_fov_rad = FOV * (np.pi/180)
     stereo_height_px = 1000
     stereo_focal_px = stereo_height_px/2 / np.tan(stereo_fov_rad/2)
     stereo_width_px = stereo_height_px + max_disp

@@ -2,11 +2,11 @@
 
 import os
 import sys
-
-import cv2
 import random
 
+import cv2
 import rosbag
+
 from cv_bridge import CvBridge
 
 
@@ -16,7 +16,6 @@ def main():
 
     bag = rosbag.Bag(args[1], "r")
     bridge = CvBridge()
-    count = 0
     
     bag_r0 = list(bag.read_messages(topics=[args[2]]))
     bag_r1 = list(bag.read_messages(topics=[args[3]]))
