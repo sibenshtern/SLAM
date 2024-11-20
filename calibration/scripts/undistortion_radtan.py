@@ -5,7 +5,7 @@ from parse_yaml import get_parameters_from_yaml
 
 
 def undistortion(cam_number):
-    args = sys.argv # img_0, img_1, yaml_file
+    args = sys.argv # img_0, img_1, yaml_file, path_to_result
 
     img = cv2.imread(args[cam_number+1])
     h,  w = img.shape[:2]
@@ -19,7 +19,7 @@ def undistortion(cam_number):
     
     newcameramatrix, _ = cv2.getOptimalNewCameraMatrix(camera_matrix, dist, (w, h), 1, (w, h))
     undistorted_image = cv2.undistort(img, camera_matrix, dist, None, newcameramatrix)
-    cv2.imwrite(f'img{cam_number}_undistortion.png', undistorted_image)
+    cv2.imwrite(f'{args[4]}_undistortion_radtan.png', undistorted_image)
 
 
 if __name__ == "__main__":

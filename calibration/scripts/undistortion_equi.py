@@ -7,13 +7,6 @@ from parse_yaml import get_parameters_from_yaml
 FOV = 125
 
 
-def get_extrinsics(src, dst):
-    extrinsics = src.get_extrinsics_to(dst)
-    R = np.reshape(extrinsics.rotation, [3,3]).T
-    T = np.array(extrinsics.translation)
-    return (R, T)
-
-
 class Data:
     def __init__(self, cam_n, path_img, path_yaml):
         self.img = cv2.imread(path_img)
@@ -25,7 +18,7 @@ class Data:
 
 
 def undistortion():
-    args = sys.argv # img_0, img_1, yaml_file
+    args = sys.argv # img_0, img_1, yaml_file, path_to_result
 
     img_l = Data(0, args[1], args[3])
     img_r = Data(0, args[2], args[3])
@@ -33,16 +26,6 @@ def undistortion():
     min_disp = 0
     num_disp = 112 - min_disp
     max_disp = min_disp + num_disp
-
-    stereo = cv2.StereoSGBM_create(minDisparity = min_disp,
-                                   numDisparities = num_disp,
-                                   blockSize = 16,
-                                   P1 = 8*3*window_size**2,
-                                   P2 = 32*3*window_size**2,
-                                   disp12MaxDiff = 1,
-                                   uniquenessRatio = 10,
-                                   speckleWindowSize = 100,
-                                   speckleRange = 32)
     
     stereo_fov_rad = FOV * (np.pi/180)
     stereo_height_px = 1000
@@ -71,16 +54,9 @@ def undistortion():
                                           map2 = undistort_rectify["right"][1],
                                           interpolation = cv2.INTER_LINEAR)}
 
-    disparity = stereo.compute(center_undistorted["left"], center_undistorted["right"]).astype(np.float32) / 16.0
+    image = cv2.cvtColor(center_undistorted["left"][:, max_disp:], cv2.COLOR_BGR2RGB)
 
-    disparity = disparity[:,max_disp:]
-
-    disp_vis = 255*(disparity - min_disp)/ num_disp
-    disp_color = cv2.applyColorMap(cv2.convertScaleAbs(disp_vis,1), cv2.COLORMAP_JET)
-    color_image = cv2.cvtColor(center_undistorted["left"][:, max_disp:], cv2.COLOR_BGR2RGB)
-
-    undist_img = np.hstack((color_image, disp_color))[:,:stereo_height_px]
-    cv2.imwrite(f'img_undistortion.png', undist_img)
+    cv2.imwrite(f'{args[4]}/img_undistortion_equi.png', image)
 
 
 if __name__ == "__main__":
