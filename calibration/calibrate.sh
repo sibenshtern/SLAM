@@ -16,8 +16,6 @@ docker run -i --rm \
 
 docker exec kalibr /bin/bash -c "source /opt/ros/noetic/setup.sh && ./kalibr_inside.sh $2 $3 $4 $5 $6 $7"
 
-docker rm -f kalibr
-
 python3 $1/scripts/import_pictures_for_undistortion.py $1/data/$2 $6 $7 $1/data/pictures
 
 first_part=$(echo "$2" | cut -d '.' -f 1)

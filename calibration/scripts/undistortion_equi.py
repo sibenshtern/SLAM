@@ -27,13 +27,12 @@ def undistortion():
     num_disp = 112 - min_disp
     max_disp = min_disp + num_disp
     
-    stereo_fov_rad = FOV * (np.pi/180)
-    stereo_height_px = HEIGHT
-    stereo_focal_px = stereo_height_px/2 / np.tan(stereo_fov_rad/2)
-    stereo_width_px = stereo_height_px + max_disp
+    stereo_fov_rad = FOV * (np.pi / 180)
+    stereo_height_px, stereo_width_px = 1000, 1060
     stereo_size = (stereo_width_px, stereo_height_px)
-    stereo_cx = (stereo_height_px - 1)/2 + max_disp
-    stereo_cy = (stereo_height_px - 1)/2
+    stereo_focal_px = stereo_height_px / 2 / np.tan(stereo_fov_rad / 2)
+    stereo_cx = (stereo_width_px - 1) / 2
+    stereo_cy = (stereo_height_px - 1) / 2
     
     P_left = np.array([[stereo_focal_px, 0, stereo_cx, 0],
                        [0, stereo_focal_px, stereo_cy, 0],
@@ -54,9 +53,11 @@ def undistortion():
                                           map2 = undistort_rectify["right"][1],
                                           interpolation = cv2.INTER_LINEAR)}
 
-    image = cv2.cvtColor(center_undistorted["left"][:, max_disp:], cv2.COLOR_BGR2RGB)
+    image_left = cv2.cvtColor(center_undistorted["left"], cv2.COLOR_BGR2RGB)
+    image_right = cv2.cvtColor(center_undistorted["right"], cv2.COLOR_BGR2RGB)
 
-    cv2.imwrite(f'{args[4]}/img_undistortion_equi.png', image)
+    cv2.imwrite(f'{args[4]}/img_undistortion_equi_left.png', image_left)
+    cv2.imwrite(f'{args[4]}/img_undistortion_equi_right.png', image_right)
 
 
 if __name__ == "__main__":
