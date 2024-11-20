@@ -5,7 +5,7 @@ from parse_yaml import get_parameters_from_yaml
 
 
 FOV = 125
-
+HEIGHT = 1000
 
 class Data:
     def __init__(self, cam_n, path_img, path_yaml):
@@ -28,7 +28,7 @@ def undistortion():
     max_disp = min_disp + num_disp
     
     stereo_fov_rad = FOV * (np.pi/180)
-    stereo_height_px = 1000
+    stereo_height_px = HEIGHT
     stereo_focal_px = stereo_height_px/2 / np.tan(stereo_fov_rad/2)
     stereo_width_px = stereo_height_px + max_disp
     stereo_size = (stereo_width_px, stereo_height_px)
