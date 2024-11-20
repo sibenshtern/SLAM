@@ -14,7 +14,9 @@ docker run -i --rm \
     -d --name=kalibr \
     -v "$1/kalibr_inside.sh:/kalibr_inside.sh" kalibr bin/bash -c "source /opt/ros/noetic/setup.sh && roscore"
 
-docker exec kalibr /bin/bash -c "source /opt/ros/noetic/setup.sh && chmod +x ./kalibr_inside.sh && ./kalibr_inside.sh $2 $3 $4 $5 $6 $7"
+docker exec kalibr /bin/bash -c "source /opt/ros/noetic/setup.sh && ./kalibr_inside.sh $2 $3 $4 $5 $6 $7"
+
+docker rm -f kalibr
 
 python3 $1/scripts/import_pictures_for_undistortion.py $1/data/$2 $6 $7 $1/data/pictures
 
