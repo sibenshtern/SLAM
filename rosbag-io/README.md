@@ -8,13 +8,20 @@
 
 ## Usage
 
+Firstly, install all requirements:
+ ```shell
+ python3 -m pip install -r requirements.txt
+ ```
+
+After that you can run scripts:
+
+### Rosbag converting
+
 ```shell
 python3 convert_bag.py [--output_dir OUTPUT_DIR] bag_file cam0_topic cam1_topic
 ```
 
 ```text
-usage: convert_bag.py [-h] [--output_dir OUTPUT_DIR] bag_file cam0_topic cam1_topic
-
 positional arguments:
   bag_file                 input ROS bag file
   cam0_topic               image topic of first camera
@@ -25,6 +32,14 @@ options:
   --output_dir OUTPUT_DIR  output directory for converted dataset
 ```
 
+### Merging imu
+
 ```shell
 python3 merge_imu.py input_bag output_bag
+```
+
+```text
+positional arguments:
+  input_bag               rosbag filename captured by RealSense T265
+  output_bag              rosbag filename with merged imu
 ```

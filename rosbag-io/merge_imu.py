@@ -7,8 +7,8 @@ from scipy.interpolate import interp1d
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("input_bag")
-parser.add_argument("output_bag")
+parser.add_argument("input_bag", help="rosbag filename captured by RealSense T265")
+parser.add_argument("output_bag", help="rosbag filename with merged imu")
 args = parser.parse_args()
 
 
