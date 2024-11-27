@@ -7,8 +7,8 @@ from scipy.interpolate import interp1d
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--input_bag")
-parser.add_argument("--output_bag")
+parser.add_argument("input_bag")
+parser.add_argument("output_bag")
 args = parser.parse_args()
 
 
