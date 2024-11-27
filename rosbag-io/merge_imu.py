@@ -1,7 +1,15 @@
+import argparse
+
 import rosbag
 import numpy as np
 from sensor_msgs.msg import Imu
 from scipy.interpolate import interp1d
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--input_bag")
+parser.add_argument("--output_bag")
+args = parser.parse_args()
 
 
 # Helper function to interpolate accelerometer data
@@ -11,8 +19,8 @@ def interpolate_accel(accel_data, accel_times, target_times):
 
 
 # Open the original bag file and a new one for writing
-bag_in = rosbag.Bag('/Users/egorivanov/datasets/walking.bag', 'r')
-bag_out = rosbag.Bag('merged_imu.bag', 'w')
+bag_in = rosbag.Bag(args.input_bag, 'r')
+bag_out = rosbag.Bag(args.output_bag, 'w')
 
 
 # Extract messages from the Accel_0 and Gyro_0 topics
