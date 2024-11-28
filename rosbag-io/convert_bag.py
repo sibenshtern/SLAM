@@ -15,66 +15,66 @@ class NotEmptyDirectory(OSError):
 def save_images_and_data(bag_file: rosbag.bag.Bag, topic: str,
                 output_dir: pathlib.Path):
     bridge = CvBridge()
-    data_directory = output_dir.joinpath('data')
+    data_directory = output_dir / 'data'
 
-    with open(f'{output_dir}/data.csv', mode='w', newline='') as file:
+    with open(output_dir / 'data.csv', mode='w', newline='') as file:
         csv_writer = csv.writer(file, delimiter=',')
 
         for topic, msg, t in bag_file.read_messages(topics=[topic]):
-            filename = f"{data_directory}/{t}.png"
+            filename = data_directory / f"{t}.png"
             cv2.imwrite(filename,
                         bridge.imgmsg_to_cv2(msg,
                                              desired_encoding="passthrough"))
             csv_writer.writerow([t, filename])
 
 
-def fix_timestamps(directory: pathlib.Path):
-    with open(f'{directory}/cam0/data.csv', 'r') as file1:
+def read_timestamps(filename: pathlib.Path) -> list[int]:
+    result = []
+
+    with open(filename, 'r') as file1:
         csv_reader1 = csv.reader(file1, delimiter=',')
 
-        timestamps_1 = []
         for row in csv_reader1:
-            timestamps_1.append(int(row[0]))
+            result.append(int(row[0]))
 
-    with open(f'{directory}/cam1/data.csv', 'r') as file2:
-        csv_reader2 = csv.reader(file2, delimiter=',')
-        timestamps_2 = []
-        for row in csv_reader2:
-            timestamps_2.append(int(row[0]))
+    return result
+
+
+def write_timestamps(filename: pathlib.Path, timestamps: list[int]) -> None:
+    with open(filename, 'w') as file1:
+        csv_writer = csv.writer(file1, delimiter=',')
+
+        for i in range(len(timestamps)):
+            csv_writer.writerow(
+                [int(timestamps[i]), f"{int(timestamps[i])}.png"])
+
+
+def fix_timestamps(directory: pathlib.Path):
+    timestamps_1 = read_timestamps(directory / 'cam0' / 'data.csv')
+    timestamps_2 = read_timestamps(directory / 'cam1' / 'data.csv')
 
     timestamps = []
     for i in range(len(timestamps_1)):
         timestamps.append(min(timestamps_1[i], timestamps_2[i]) + round(
             abs(timestamps_1[i] - timestamps_2[i]) / 2))
 
-    with open(f'{directory}/timestamps.txt', 'w') as file:
+    with open(directory / 'timestamps.txt', 'w') as file:
         for timestamp in timestamps:
             file.write(f"{int(timestamp)}\n")
 
-    with open(f'{directory}/cam0/data.csv', 'w') as file1:
-        csv_writer = csv.writer(file1, delimiter=',')
+    write_timestamps(directory / 'cam0' / 'data.csv', timestamps)
+    write_timestamps(directory / 'cam1' / 'data.csv', timestamps)
 
-        for i in range(len(timestamps)):
-            csv_writer.writerow(
-                [int(timestamps[i]), f"{int(timestamps[i])}.png"])
-
-    with open(f'{directory}/cam1/data.csv', 'w') as file1:
-        csv_writer = csv.writer(file1, delimiter=',')
-
-        for i in range(len(timestamps)):
-            csv_writer.writerow(
-                [int(timestamps[i]), f"{int(timestamps[i])}.png"])
-
-    cam0_png = sorted(os.listdir(f'{directory}/cam0/data'),
+    cam0_png = sorted((directory / 'cam0' / 'data').iterdir(),
                       key=lambda el: int(el.split('.')[0]))
-    cam1_png = sorted(os.listdir(f'{directory}/cam1/data'),
+    cam1_png = sorted((directory / 'cam1' / 'data').iterdir(),
                       key=lambda el: int(el.split('.')[0]))
 
     for i in range(len(timestamps)):
-        os.rename(f"{directory}/cam0/data/{cam0_png[i]}",
-                  f"{directory}/cam0/data/{timestamps[i]}.png")
-        os.rename(f"{directory}/cam1/data/{cam1_png[i]}",
-                  f"{directory}/cam1/data/{timestamps[i]}.png")
+        os.rename(directory / 'cam0' / 'data' / f"{cam0_png[i]}",
+                  directory / "cam0" / "data" / f"{timestamps[i]}.png")
+        os.rename(directory / 'cam1' / 'data' / f"{cam0_png[i]}",
+                  directory / "cam1" / "data" / f"{timestamps[i]}.png")
 
 
 def main():
@@ -99,11 +99,11 @@ def main():
     if root_folder.exists() and len(os.listdir(root_folder)) > 0:
         raise NotEmptyDirectory(f"{root_folder} not empty.")
 
-    cam0_directory = root_folder.joinpath('mav0').joinpath('cam0')
-    cam1_directory = root_folder.joinpath('mav0').joinpath('cam1')
+    cam0_directory = root_folder / 'mav0'/ 'cam0'
+    cam1_directory = root_folder / 'mav0'/ 'cam1'
 
-    os.makedirs(cam0_directory.joinpath('data'))
-    os.makedirs(cam1_directory.joinpath('data'))
+    os.makedirs(cam0_directory / 'data')
+    os.makedirs(cam1_directory / 'data')
 
     bag_file = rosbag.Bag(args.bag_file, 'r')
 
@@ -112,7 +112,7 @@ def main():
 
     bag_file.close()
 
-    fix_timestamps(root_folder.joinpath('mav0'))
+    fix_timestamps(root_folder / 'mav0')
 
 
 if __name__ == '__main__':
