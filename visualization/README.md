@@ -6,7 +6,7 @@ This scripts helps analyzing and comparing trajectory data. It supports:
 
 ## Dependencies:
 ```bash
-pip install numpy scipy pandas tabulate open3d
+pip install -r requirements.txt
 ```
 
 # Usage
@@ -20,26 +20,24 @@ python analysis.py <gt_filepath> <alg_filepath1> <alg_filepath2> ... -c -p
 - `<alg_filepathX>`: Paths to algorithm-generated trajectory files.
 - `-c`, `--compute`: Compute error metrics.
 - `-p`, `--plot`: Plot trajectories.
-- `-f <frequency>`, `--frequency <frequency>`: Sampling frequency for visualization (default: 30).
 
 ## 2. Plot Trajectories
 Use plot.py to visualize one or more trajectories:
 ```bash
-python plot.py <trajectory_filepath1> <trajectory_filepath2> ... -f 10
+python plot.py <trajectory_filepath1> <trajectory_filepath2> ...
 ```
 ## Arguments:
 - `<trajectory_filepathX>`: Paths to trajectory files.
-- `-f <frequency>`, `--frequency <frequency>`: Sampling frequency for visualization (default: 30).
 
 # Output:
 ## 1. Error Metrics: Console table of ATE and RPE.
 ```
-Trajectory              ATE Pos    ATE Rot    RPE Pos (d=1)    RPE Rot (d=1)
---------------------  ---------  ---------  ---------------  ---------------
-data.csv               0.000000   0.000000         0.000000         0.000000
-f_MH03.txt.txt         0.028140   2.940068         1.023401         0.091778
-data_MH03_medium.csv   3.707404   0.958546         0.518286         0.055737
+Trajectory           ATE Pos    ATE Rot    RPE Pos (d=1)    RPE Rot (d=1)
+-----------------  ---------  ---------  ---------------  ---------------
+data.csv            0.000000   0.000000         0.000000         0.000000
+MH03_orb.txt        0.028140   0.016719         1.023401         0.004865
+MH03_openvins.csv   0.265349   0.039845         1.214834         0.021005
 ```
 
 ## (optional) 2. Plots: Interactive 3D plots of trajectories
-![Imgur](https://imgur.com/JflGtp1.jpg)
+![Imgur](https://imgur.com/PwXkyF2.jpg)
