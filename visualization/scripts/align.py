@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 
-def align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a, flag_ts=True):
+def align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a):
     """
     align parameters of groundtruth trajectory with algorithm timestamps
 
@@ -12,7 +12,7 @@ def align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a, 
         parameters from groundtruth
     timestamps_a : numpy.ndarray
         timestamps from algorithm
-    
+
     Returns
     -------
     aligned_positions_gt, aligned_quaternions_gt : numpy.ndarray
@@ -37,13 +37,17 @@ def align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a, 
     aligned_positions_gt = np.array(aligned_positions_gt)
     aligned_quaternions_gt = np.array(aligned_quaternions_gt)
 
-    if flag_ts:
-        return aligned_timestamps_gt, aligned_positions_gt, aligned_quaternions_gt
-    else:
-        return aligned_positions_gt, aligned_quaternions_gt
+    return aligned_timestamps_gt, aligned_positions_gt, aligned_quaternions_gt
 
 
-def align_trajectories(timestamps_gt, positions_gt, quaternions_gt, timestamps_a, positions_a, quaternions_a):
+def align_trajectories(
+    timestamps_gt,
+    positions_gt,
+    quaternions_gt,
+    timestamps_a,
+    positions_a,
+    quaternions_a,
+):
     """
     align algorithm trajectory with groundtruth trajectory
 
@@ -53,13 +57,15 @@ def align_trajectories(timestamps_gt, positions_gt, quaternions_gt, timestamps_a
         parameters from groundtruth
     timestamps_a, positions_a, quaternions_a : numpy.ndarray
         parameters from algorithm
-    
+
     Returns
     -------
     aligned_positions_a, aligned_quaternions_a : numpy.ndarray
         aligned parameters of algorithm trajectory
     """
-    timestamps_gt, positions_gt, quaternions_gt = align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a)
+    timestamps_gt, positions_gt, quaternions_gt = align_timestamps(
+        timestamps_gt, positions_gt, quaternions_gt, timestamps_a
+    )
 
     mu_gt = np.mean(positions_gt, axis=0)
     mu_a = np.mean(positions_a, axis=0)
@@ -70,28 +76,22 @@ def align_trajectories(timestamps_gt, positions_gt, quaternions_gt, timestamps_a
     n = np.shape(positions_gt)[0]
 
     # cross-covariance matrix
-    C = 1.0 / n * np.dot(centered_gt.T, centered_a)
-    sigma2 = 1.0 / n * np.multiply(centered_a, centered_a).sum()
+    C = np.dot(centered_gt.T, centered_a) / n
 
-    U, D, Vt = np.linalg.linalg.svd(C)
-    D = np.diag(D)
+    U, _, Vt = np.linalg.linalg.svd(C)
 
     W = np.eye(3)
-    if(np.linalg.det(U) * np.linalg.det(Vt.T) < 0):
+    if np.linalg.det(U) * np.linalg.det(Vt.T) < 0:
         W[2, 2] = -1
 
     delta_R = np.dot(U, np.dot(W, Vt))
-    s = 1.0 / sigma2 * np.trace(np.dot(D, W))
-    
-    # in SE(3):
-    s = 1
 
-    delta_t = mu_gt - s * np.dot(delta_R, mu_a)
+    delta_t = mu_gt - np.dot(delta_R, mu_a)
 
-    aligned_positions_a = s * np.dot(delta_R, positions_a.T).T + delta_t
+    aligned_positions_a = np.dot(delta_R, positions_a.T).T + delta_t
 
     aligned_quaternions_a = []
-    for (q_gt, q_a) in [*zip(quaternions_gt, quaternions_a)]:
+    for q_gt, q_a in [*zip(quaternions_gt, quaternions_a)]:
         R_a = R.from_quat(q_a).as_matrix()
         R_aligned = np.dot(delta_R, R_a)
         q_aligned = R.from_matrix(R_aligned).as_quat()

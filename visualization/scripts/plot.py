@@ -9,14 +9,13 @@ import load
 import align
 
 
-def draw_trajectory(positions, quaternions, frequency=30, color=[1, 0, 0]):
+def draw_trajectory(positions, quaternions, color=[1, 0, 0]):
     """
     draw single trajectory using open3d
 
     Parameters
     ----------
     positions, quaternions : numpy.ndarray
-    frequency : int, default=30
     color : list, default=[1, 0, 0]
 
     Returns
@@ -25,17 +24,15 @@ def draw_trajectory(positions, quaternions, frequency=30, color=[1, 0, 0]):
     """
     frames = []
 
-    for i, (pos, quat) in enumerate(zip(positions[::frequency], quaternions[::frequency])):
-        #f = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.2)
-
-        size = 0.2
+    for i, (pos, quat) in enumerate(zip(positions, quaternions)):
+        size = 0.08
 
         np_points = np.array([[0, 0, 0], [size, 0, 0], [0, size, 0], [0, 0, size]])
         np_lines = np.array([[0, 1], [0, 2], [0, 3]])
 
         l = o3d.geometry.LineSet(
             points=o3d.utility.Vector3dVector(np_points),
-            lines=o3d.utility.Vector2iVector(np_lines)
+            lines=o3d.utility.Vector2iVector(np_lines),
         )
 
         rot = rot = R.from_quat(quat).as_matrix()
@@ -48,6 +45,7 @@ def draw_trajectory(positions, quaternions, frequency=30, color=[1, 0, 0]):
 
     return frames
 
+
 def plot_from_filepaths(args):
     """
     plot (single / multiple) trajectories from filepaths
@@ -55,47 +53,75 @@ def plot_from_filepaths(args):
     Parameters
     ----------
     filepath : str
-    frequency : int, default=30
     """
     frames = []
-    colors = [colorsys.hsv_to_rgb(i / len(args.filepaths), 1, 1) for i in range(len(args.filepaths))]
+    colors = [
+        colorsys.hsv_to_rgb(i / len(args.filepaths), 1, 1)
+        for i in range(len(args.filepaths))
+    ]
 
     # gt
     t_gt, p_gt, q_gt = load.load_trajectory(args.filepaths[0])
-    frames += draw_trajectory(p_gt, q_gt, args.frequency, colors[-1])
-    
+
+    # qw, qx, qy, qz -> qx, qy, qz, qw
+    q_gt = q_gt[:, [1, 2, 3, 0]]
+
+    timestamps = [t_gt]
+    positions = [p_gt]
+    quaternions = [q_gt]
+
     for i, f in enumerate(args.filepaths[1:]):
-        timestamps, positions, quaternions = load.load_trajectory(f)
-        positions, quaternions = align.align_trajectories(t_gt, p_gt, q_gt, timestamps, positions, quaternions)
-        frames += draw_trajectory(positions, quaternions, args.frequency, colors[i])
+        t_a, p_a, q_a = load.load_trajectory(f)
+        p_a, q_a = align.align_trajectories(t_gt, p_gt, q_gt, t_a, p_a, q_a)
+        timestamps.append(t_a)
+        positions.append(p_a)
+        quaternions.append(q_a)
+
+    # find shortest trajectory
+    idx_min = np.argmin([len(ts) for ts in timestamps])
+
+    for i in range(len(args.filepaths)):
+        ts, p, q = align.align_timestamps(
+            timestamps[i], positions[i], quaternions[i], timestamps[idx_min]
+        )
+        frames += draw_trajectory(p, q, colors[i])
 
     o3d.visualization.draw_geometries(frames)
 
 
-def plot_from_pq(args):
+def plot_from_tpq(args):
     """
-    plot (single / multiple) trajectories from positions and quaternions
+    plot (single / multiple) trajectories from timestamps, positions and quaternions
 
     Parameters
     ----------
-    positions, quaternions : list
-    frequency : int, default=30
+    timestamps, positions, quaternions : numpy.ndarray
     """
     frames = []
-    colors = [colorsys.hsv_to_rgb(i / len(args.positions), 1, 1) for i in range(len(args.positions))]
+    colors = [
+        colorsys.hsv_to_rgb(i / len(args.positions), 1, 1)
+        for i in range(len(args.timestamps))
+    ]
 
-    for i, (pos, quat) in enumerate([*zip(args.positions, args.quaternions)]):
-        frames += draw_trajectory(pos, quat, args.frequency, colors[i])
+    # find shortest trajectory
+    idx_min = np.argmin([len(ts) for ts in args.timestamps])
+
+    for i in range(len(args.timestamps)):
+        ts, p, q = align.align_timestamps(
+            args.timestamps[i],
+            args.positions[i],
+            args.quaternions[i],
+            args.timestamps[idx_min],
+        )
+        frames += draw_trajectory(p, q, colors[i])
 
     o3d.visualization.draw_geometries(frames)
-    
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="plot.py")
 
     parser.add_argument("filepaths", nargs="+", help="paths to the trajectories")
-    parser.add_argument("-f", "--frequency", nargs='?', type=int, default=30,
-                        help="frequency of plotted trajectories")
 
     args = parser.parse_args()
 

@@ -19,19 +19,19 @@ def load_trajectory(filepath, flag_ts=True):
     Unsupported file format
         if filepath is not .csv or .txt format
     """
-    if filepath.endswith('.csv'):
+    if filepath.endswith(".csv"):
         df = pd.read_csv(filepath)
 
         timestamps = df.iloc[:, 0].values
         positions = df.iloc[:, 1:4].values
         quaternions = df.iloc[:, 4:8].values
 
-    elif filepath.endswith('.txt'):
+    elif filepath.endswith(".txt"):
         timestamps = []
         positions = []
         quaternions = []
 
-        with open(filepath, 'r') as file:
+        with open(filepath, "r") as file:
             for line in file:
                 values = line.strip().split()
                 timestamps.append(float(values[0]))
@@ -48,6 +48,5 @@ def load_trajectory(filepath, flag_ts=True):
     if flag_ts:
         return timestamps, positions, quaternions
     else:
-        
-        return positions, quaternions
 
+        return positions, quaternions
