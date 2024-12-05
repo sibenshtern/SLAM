@@ -46,49 +46,6 @@ def draw_trajectory(positions, quaternions, color=[1, 0, 0]):
     return frames
 
 
-def plot_from_filepaths(args):
-    """
-    plot (single / multiple) trajectories from filepaths
-
-    Parameters
-    ----------
-    filepath : str
-    """
-    frames = []
-    colors = [
-        colorsys.hsv_to_rgb(i / len(args.filepaths), 1, 1)
-        for i in range(len(args.filepaths))
-    ]
-
-    # gt
-    t_gt, p_gt, q_gt = load.load_trajectory(args.filepaths[0])
-
-    # qw, qx, qy, qz -> qx, qy, qz, qw
-    q_gt = q_gt[:, [1, 2, 3, 0]]
-
-    timestamps = [t_gt]
-    positions = [p_gt]
-    quaternions = [q_gt]
-
-    for i, f in enumerate(args.filepaths[1:]):
-        t_a, p_a, q_a = load.load_trajectory(f)
-        p_a, q_a = align.align_trajectories(t_gt, p_gt, q_gt, t_a, p_a, q_a)
-        timestamps.append(t_a)
-        positions.append(p_a)
-        quaternions.append(q_a)
-
-    # find shortest trajectory
-    idx_min = np.argmin([len(ts) for ts in timestamps])
-
-    for i in range(len(args.filepaths)):
-        ts, p, q = align.align_timestamps(
-            timestamps[i], positions[i], quaternions[i], timestamps[idx_min]
-        )
-        frames += draw_trajectory(p, q, colors[i])
-
-    o3d.visualization.draw_geometries(frames)
-
-
 def plot_from_tpq(args):
     """
     plot (single / multiple) trajectories from timestamps, positions and quaternions
@@ -107,7 +64,7 @@ def plot_from_tpq(args):
     idx_min = np.argmin([len(ts) for ts in args.timestamps])
 
     for i in range(len(args.timestamps)):
-        ts, p, q = align.align_timestamps(
+        ts, p, q = align.match_groundtruth_to_timestamps(
             args.timestamps[i],
             args.positions[i],
             args.quaternions[i],
@@ -116,6 +73,38 @@ def plot_from_tpq(args):
         frames += draw_trajectory(p, q, colors[i])
 
     o3d.visualization.draw_geometries(frames)
+
+
+def plot_from_filepaths(args):
+    """
+    plot (single / multiple) trajectories from filepaths
+
+    Parameters
+    ----------
+    filepath : str
+    """
+    # gt
+    t_gt, p_gt, q_gt = load.load_trajectory(args.filepaths[0])
+
+    # qw, qx, qy, qz -> qx, qy, qz, qw
+    q_gt = q_gt[:, [1, 2, 3, 0]]
+
+    timestamps = [t_gt]
+    positions = [p_gt]
+    quaternions = [q_gt]
+
+    for i, f in enumerate(args.filepaths[1:]):
+        t_a, p_a, q_a = load.load_trajectory(f)
+        p_a, q_a = align.align_trajectory(t_gt, p_gt, q_gt, t_a, p_a, q_a)
+        timestamps.append(t_a)
+        positions.append(p_a)
+        quaternions.append(q_a)
+
+    plot_from_tpq(
+        argparse.Namespace(
+            timestamps=timestamps, positions=positions, quaternions=quaternions
+        )
+    )
 
 
 if __name__ == "__main__":

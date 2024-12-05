@@ -33,7 +33,7 @@ def compute_ate(
     ate_rot = []
 
     trajectories_gt_aligned, positions_gt_aligned, quaternions_gt_aligned = (
-        align.align_timestamps(
+        align.match_groundtruth_to_timestamps(
             timestamps_gt, positions_gt, quaternions_gt, timestamps_a
         )
     )
@@ -110,7 +110,7 @@ def compute_rpe(
     rpe_rot = []
 
     trajectories_gt_aligned, positions_gt_aligned, quaternions_gt_aligned = (
-        align.align_timestamps(
+        align.match_groundtruth_to_timestamps(
             timestamps_gt, positions_gt, quaternions_gt, timestamps_a
         )
     )
@@ -136,7 +136,7 @@ def compute_rpe(
             delta_quat_a = quaternions_a[start_idx:end_idx]
 
             # align algorithm subtrajectory to gt subtrajectory
-            delta_pos_a, delta_quat_a = align.align_trajectories(
+            delta_pos_a, delta_quat_a = align.align_trajectory(
                 delta_ts_gt,
                 delta_pos_gt,
                 delta_quat_gt,

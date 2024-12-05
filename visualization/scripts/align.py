@@ -2,7 +2,9 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 
-def align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a):
+def match_groundtruth_to_timestamps(
+    timestamps_gt, positions_gt, quaternions_gt, timestamps_a
+):
     """
     align parameters of groundtruth trajectory with algorithm timestamps
 
@@ -40,7 +42,7 @@ def align_timestamps(timestamps_gt, positions_gt, quaternions_gt, timestamps_a):
     return aligned_timestamps_gt, aligned_positions_gt, aligned_quaternions_gt
 
 
-def align_trajectories(
+def align_trajectory(
     timestamps_gt,
     positions_gt,
     quaternions_gt,
@@ -63,7 +65,7 @@ def align_trajectories(
     aligned_positions_a, aligned_quaternions_a : numpy.ndarray
         aligned parameters of algorithm trajectory
     """
-    timestamps_gt, positions_gt, quaternions_gt = align_timestamps(
+    timestamps_gt, positions_gt, quaternions_gt = match_groundtruth_to_timestamps(
         timestamps_gt, positions_gt, quaternions_gt, timestamps_a
     )
 

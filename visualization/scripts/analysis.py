@@ -47,7 +47,7 @@ def align_trajectories(args):
     for t_a, p_a, q_a in [
         *zip(args.timestamps[1:], args.positions[1:], args.quaternions[1:])
     ]:
-        aligned_p_a, aligned_q_a = align.align_trajectories(
+        aligned_p_a, aligned_q_a = align.align_trajectory(
             t_gt, p_gt, q_gt, t_a, p_a, q_a
         )
 
